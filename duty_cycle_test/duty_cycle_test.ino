@@ -6,6 +6,9 @@ bool Bnew = false;
 
 long pulse = 0;
 float angle = 0;
+uint8_t duty = 0;
+int desired_angle = 30;
+int error = 0;
 
 const byte ChA = 21;
 const byte ChB = 20;
@@ -56,16 +59,23 @@ void loop() {
 //  Serial.println(dutyCycle);
   // Encoder
   updateAngle();
-  if(angle < 180 ) 
+  duty = 30;
+  error = angle - desired_angle;
+
+  if( abs(error) < 10 ) 
   {
-    
-    Serial.println(1);
+    // direction = 0;
+    MyMotor.setHallBLDCmotorDCspeed(direction,0,WEAKENING);  
+  }
+  else if(error < 0)
+  {
+    direction = 0;
     MyMotor.setHallBLDCmotorDCspeed(direction,30,WEAKENING);  
   }
   else
   {
-    Serial.println(0);
-    MyMotor.setHallBLDCmotorDCspeed(direction,0,WEAKENING);  
+    direction = 1;
+    MyMotor.setHallBLDCmotorDCspeed(direction,30,WEAKENING);  
   }
 //    Serial.println(angle);
   
