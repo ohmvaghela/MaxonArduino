@@ -21,13 +21,13 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 30;
+float desiredAngle = 90;
 float error;
 
 const byte ChA = 21;
 const byte ChB = 20;
 
-int GearReduction = 1;
+long GearReduction = 80;
 long PPR = 16384*GearReduction;
 ///////////////////////////////////////////////////
 
@@ -64,12 +64,14 @@ void printStates()
 {
   Serial.print("current angle : ");
   Serial.print(angle);
-  Serial.print(" | Pulse : ");
-  Serial.print(pulse);
+//  Serial.print(" | Pulse : ");
+//  Serial.print(pulse);
   Serial.print(" | Desired angle : ");
   Serial.print(desiredAngle);
   Serial.print(" | error : ");
   Serial.print(error);
+  Serial.print(" | dutyCycle: ");
+  Serial.print(dutyCycle);
   if(direction) Serial.println(" | CW");
   else          Serial.println(" | CCW");
 
@@ -83,7 +85,8 @@ void rotateMotor()
 
 void updateDutyCycle()
 {
-  dutyCycle = 30 + 20*(error/180.0f);
+  if(error > 1) dutyCycle = 30 + 20*(error/180.0f);
+  else dutyCycle = 0;
 }
 
 void updateError()
