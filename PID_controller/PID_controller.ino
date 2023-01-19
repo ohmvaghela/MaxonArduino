@@ -2,13 +2,12 @@
 //BLDC
 #include <SD.h>
 #include "IFX007T-Motor-Control.h"
+
 #define WEAKENING  0           // 0=normal, 1=weak (fast)
 const float stepsPerDegree = 10.0; // Adjust this value based on your motor
-String input = "+";
-int direction = 1;
-//float angle[6] = {1, 50, 200, 300, 600, 800} ;
-float rpm=0;
+int direction = 1;// 1 CW // 0 CCW
 uint8_t dutyCycle = 30;
+
 //Create an instance of 'IFX007TMotorControl' called 'MyMotor'
 IFX007TMotorControl MyMotor = IFX007TMotorControl();
 ///////////////////////////////////////////////////
@@ -72,19 +71,22 @@ void rotateMotor()
 
 void updateDutyCycle();
 {
-  float b = 180.0f;
-  dutyCycle = 30 + 20*(error/b);
+  dutyCycle = 30 + 20*(error/180.0f);
 }
 
 void updateError()
 {
-  float a = 360.0f;
-  error = desiredAngle - angle;
-  error = error%a;
-  if(error>180) 
+  error = angle - desiredAngle;
+  if(error > 0)
   {
-    error =180 - (error - (error/180)*180 );
-    direction = !direction;
+    if(error < 180) direction = 1;
+    else direction = 0;
+  }
+  else
+  {
+    error = -1*error;
+    if(error < 180) direction = 0;
+    else direction = 1;
   }
 }
 
