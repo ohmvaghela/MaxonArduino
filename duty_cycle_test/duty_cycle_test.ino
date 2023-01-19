@@ -88,6 +88,8 @@ void updateAngle()
   if(pulse<0)pulse = (16384);
   pulse = pulse%(16384);
   angle = (float)pulse*360/(16384);
+
+
 }
 void changeA()
 {

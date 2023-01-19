@@ -22,6 +22,8 @@ bool Bnew = false;
 
 float pulse = 0;
 float angle = 0;
+float desiredAngle = 120;
+float error;
 
 const byte ChA = 21;
 const byte ChB = 20;
@@ -52,24 +54,54 @@ void setup() {
 
 void loop() {
 
-  Serial.print("Angle : ");
-  Serial.println(angle);
+  updateStates();
   
-  updateAngle();
+  Serial.print("error : ");
+  Serial.println(error);
+
+  rotateMotor();
+  desiredAngle++;
+
 }
 
-void PIDControl()
+void rotateMotor()
 {
-    // maxDutyCycle :50
-    // minDutyCycle :30
-    
+  MyMotor.setHallBLDCmotorDCspeed(direction,dutyCycle,WEAKENING);  
+}
+
+
+void updateDutyCycle();
+{
+  float b = 180.0f;
+  dutyCycle = 30 + 20*(error/b);
+}
+
+void updateError()
+{
+  float a = 360.0f;
+  error = desiredAngle - angle;
+  error = error%a;
+  if(error>180) 
+  {
+    error =180 - (error - (error/180)*180 );
+    direction = !direction;
+  }
 }
 
 void updateAngle()
 {
+
   if(pulse<0)pulse = PPR;//4*4096 from data sheet
   pulse = pulse%PPR;
   angle = pulse*360/PPR;
+
+}
+
+void updateStates()
+{
+  updateAngle();
+  updateError();
+  updateDutyCycle();
 }
 
 void changeA()
