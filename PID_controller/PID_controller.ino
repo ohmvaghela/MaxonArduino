@@ -19,16 +19,16 @@ bool Bold = false;
 bool Anew = false;
 bool Bnew = false;
 
-float pulse = 0;
+float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 120;
+float desiredAngle = 30;
 float error;
 
 const byte ChA = 21;
 const byte ChB = 20;
 
 int GearReduction = 1;
-float PPR = 16384*GearReduction;
+long PPR = 16384*GearReduction;
 ///////////////////////////////////////////////////
 
 void setup() {
@@ -54,12 +54,24 @@ void setup() {
 void loop() {
 
   updateStates();
-  
-  Serial.print("error : ");
-  Serial.println(error);
 
+  printStates();
   rotateMotor();
-  desiredAngle++;
+
+}
+
+void printStates()
+{
+  Serial.print("current angle : ");
+  Serial.print(angle);
+  Serial.print(" | Pulse : ");
+  Serial.print(pulse);
+  Serial.print(" | Desired angle : ");
+  Serial.print(desiredAngle);
+  Serial.print(" | error : ");
+  Serial.print(error);
+  if(direction) Serial.println(" | CW");
+  else          Serial.println(" | CCW");
 
 }
 
@@ -69,7 +81,7 @@ void rotateMotor()
 }
 
 
-void updateDutyCycle();
+void updateDutyCycle()
 {
   dutyCycle = 30 + 20*(error/180.0f);
 }
@@ -80,25 +92,32 @@ void updateError()
   if(error > 0)
   {
     if(error < 180) direction = 1;
-    else direction = 0;
+    else 
+    {
+      direction = 0;
+      error = 360 - error;
+    }
   }
   else
   {
     error = -1*error;
     if(error < 180) direction = 0;
-    else direction = 1;
+    else 
+    {
+      direction = 1;
+      error = 360 - error;
+    }
   }
 }
 
+
 void updateAngle()
 {
-
-  if(pulse<0)pulse = PPR;//4*4096 from data sheet
-  pulse = pulse%PPR;
-  angle = pulse*360/PPR;
-
+  if(pulse<0)pulse = PPR-1;//4*4096 from data sheet
+  pulse = fmod(pulse,PPR);
+//  pulse = pulse - PPR*(int)(pulse/PPR);
+  angle = (pulse*360)/PPR;
 }
-
 void updateStates()
 {
   updateAngle();

@@ -4,7 +4,7 @@ bool Anew = false;
 bool Bnew = false;
 
 float pulse = 0;
-float angle = 0;
+int angle = 0;
 
 const byte ChA = 21;
 const byte ChB = 20;
@@ -24,17 +24,20 @@ void setup() {
 
 void loop() {
 
-  Serial.print("Angle : ");
+  Serial.print("pulse : ");
+  Serial.print(pulse);
+  Serial.print(" | Angle : ");
   Serial.println(angle);
   updateAngle();
 }
-
 void updateAngle()
 {
-  if(pulse<0)pulse = PPR;//4*4096 from data sheet
-  pulse = pulse%PPR;
-  angle = pulse*360/PPR;
+  if(pulse<0)pulse = PPR-1;//4*4096 from data sheet
+  pulse = fmod(pulse,PPR);
+//  pulse = pulse - PPR*(int)(pulse/PPR);
+  angle = (pulse*360)/PPR;
 }
+
 
 void changeA()
 {
@@ -62,15 +65,16 @@ void updatePulse(){
  * A : HIGH - HIGH  | B : HIGH - LOW 
  */
 
-       if(  Aold && !Anew &&  Bold  &&  Bnew ) pulse = pulse + 1.0;
-  else if( !Aold && !Anew &&  Bold  && !Bnew ) pulse = pulse + 1.0;
-  else if( !Aold &&  Anew && !Bold  && !Bnew ) pulse = pulse + 1.0;
-  else if(  Aold &&  Anew && !Bold  &&  Bnew ) pulse = pulse + 1.0;
- 
-  else if(  Anew && !Aold &&  Bnew  &&  Bold ) pulse = pulse - 1.0;
-  else if( !Anew && !Aold &&  Bnew  && !Bold ) pulse = pulse - 1.0;
-  else if( !Anew &&  Aold && !Bnew  && !Bold ) pulse = pulse - 1.0;
-  else if(  Anew &&  Aold && !Bnew  &&  Bold ) pulse = pulse - 1.0;
+
+       if(  Aold && !Anew &&  Bold  &&  Bnew ) pulse += 1;
+  else if( !Aold && !Anew &&  Bold  && !Bnew ) pulse += 1;
+  else if( !Aold &&  Anew && !Bold  && !Bnew ) pulse += 1;
+  else if(  Aold &&  Anew && !Bold  &&  Bnew ) pulse += 1;
+
+  else if(  Anew && !Aold &&  Bnew  &&  Bold ) pulse -= 1;
+  else if( !Anew && !Aold &&  Bnew  && !Bold ) pulse -= 1;
+  else if( !Anew &&  Aold && !Bnew  && !Bold ) pulse -= 1;
+  else if(  Anew &&  Aold && !Bnew  &&  Bold ) pulse -= 1;
 
   Aold = Anew;
   Bold = Bnew;
