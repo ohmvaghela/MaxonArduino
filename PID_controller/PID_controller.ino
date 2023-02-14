@@ -1,3 +1,8 @@
+// about encoder connection 
+// 20 - ChA - 6
+// 21 - ChB - 8
+// CCW - Positive
+
 ///////////////////////////////////////////////////
 //BLDC
 #include <SD.h>
@@ -21,7 +26,7 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 90;
+float desiredAngle = 30;
 float error;
 
 const byte ChA = 21;
@@ -34,6 +39,7 @@ long PPR = 16384*GearReduction;
 void setup() {
   Serial.begin(115200);
   Serial.println(" Infineon hall sensor BLDC motor test! ");
+
 
   pinMode(ChA, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ChA), changeA, CHANGE);
@@ -85,7 +91,7 @@ void rotateMotor()
 
 void updateDutyCycle()
 {
-  if(error > 1) dutyCycle = 30 + 20*(error/180.0f);
+  if(error > 3) dutyCycle = 30 + 20*(error/180.0f);
   else dutyCycle = 0;
 }
 
@@ -130,14 +136,25 @@ void updateStates()
 
 void changeA()
 {
-  Anew = !Anew;
+  Anew = digitalRead(ChA);
   updatePulse();
 }
 void changeB()
 {
-  Bnew = !Bnew;
+  Bnew = digitalRead(ChB);
   updatePulse();
 }
+
+//void changeA() {
+//  int a = digitalRead(encoderPinA);
+//  int b = digitalRead(encoderPinB);
+//  if (a == b) {
+//    pulse--;
+//  } else {
+//    pulse++;
+//  }
+//}
+
 
 
 void updatePulse(){

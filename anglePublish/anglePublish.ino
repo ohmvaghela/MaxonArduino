@@ -19,12 +19,12 @@ float PPR = 16384 * GearReduction;
 ros::NodeHandle nh;
 
 exo_angle_control::ExoAngle curAngle;
-ros::Publisher pub_temp("temperature", &curAngle);
+ros::Publisher pub_temp("updateAngleTopic", &curAngle);
 
 void setup()
 {
     // general
-    Serial.begin(115200);
+    Serial.begin(57600);
 
     // encoder
     pinMode(ChA, INPUT_PULLUP);
@@ -54,10 +54,10 @@ void loop()
 
 void updateAndPublish()
 {
-    curAngle.hipLeft = hipLeft;
-    curAngle.hipRight = hipRight;
-    curAngle.kneeLeft = kneeLeft;
-    curAngle.kneeRight = kneeRight;
+//    curAngle.hipLeft = angle;
+//    curAngle.hipRight = angle;
+    curAngle.kneeLeft = angle;
+//    curAngle.kneeRight = angle;
     pub_temp.publish(&curAngle);
 }
 

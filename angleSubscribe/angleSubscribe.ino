@@ -10,8 +10,8 @@ ros::NodeHandle nh;
 
 void messageCb(const exo_angle_control::ExoAngle &angles)
 {
-//    Serial.println("angles recived : ");
-//    Serial.print(angles.hipLeft);
+    Serial.println("angles recived : ");
+    Serial.print(angles.hipLeft);
 //    
      digitalWrite(LED_BUILTIN, HIGH - digitalRead(LED_BUILTIN)); // blink the led
 }

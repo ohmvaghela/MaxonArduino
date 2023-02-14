@@ -1,4 +1,5 @@
-///////////////////////////////////////////////////
+//hipLeft
+ ///////////////////////////////////////////////////
 // BLDC
 #include <SD.h>
 #include "IFX007T-Motor-Control.h"
@@ -26,11 +27,11 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 90;
+float desiredAngle = 0;
 float error;
 
-const byte ChA = 21;
-const byte ChB = 20;
+const byte ChA = 20;
+const byte ChB = 21;
 
 long GearReduction = 80;
 long PPR = 16384 * GearReduction;
@@ -42,10 +43,6 @@ ros::NodeHandle nh;
 void messageCb(const exo_angle_control::ExoAngle &angles)
 {
     desiredAngle = angles.hipLeft;
-    Serial.println("angles recived : ");
-    Serial.print(desiredAngle);
-    
-    // digitalWrite(LED_BUILTIN, HIGH - digitalRead(LED_BUILTIN)); // blink the led
 }
 ros::Subscriber<exo_angle_control::ExoAngle> sub("desiredAngleTopic", &messageCb);
 
@@ -85,32 +82,15 @@ void loop()
 {
     // encoder
     updateStates();
-    printStates();
     
     // BLDC
     rotateMotor();
 
     // ROS
     nh.spinOnce();
+    delay(1);
 }
 
-void printStates()
-{
-    Serial.print("current angle : ");
-    Serial.print(angle);
-    //  Serial.print(" | Pulse : ");
-    //  Serial.print(pulse);
-    Serial.print(" | Desired angle : ");
-    Serial.print(desiredAngle);
-    Serial.print(" | error : ");
-    Serial.print(error);
-    Serial.print(" | dutyCycle: ");
-    Serial.print(dutyCycle);
-    if (direction)
-        Serial.println(" | CW");
-    else
-        Serial.println(" | CCW");
-}
 
 void rotateMotor()
 {
@@ -119,7 +99,7 @@ void rotateMotor()
 
 void updateDutyCycle()
 {
-    if (error > 1)
+    if (error > 3)
         dutyCycle = 30 + 20 * (error / 180.0f);
     else
         dutyCycle = 0;
