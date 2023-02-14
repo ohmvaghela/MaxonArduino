@@ -30,8 +30,8 @@ float angle = 0;
 float desiredAngle = 0;
 float error;
 
-const byte ChA = 20;
-const byte ChB = 21;
+const byte ChA = 21;
+const byte ChB = 20;
 
 long GearReduction = 80;
 long PPR = 16384 * GearReduction;
@@ -148,12 +148,12 @@ void updateStates()
 
 void changeA()
 {
-    Anew = !Anew;
+    Anew = digitalRead(ChA);
     updatePulse();
 }
 void changeB()
 {
-    Bnew = !Bnew;
+    Bnew = digitalRead(ChB);
     updatePulse();
 }
 
