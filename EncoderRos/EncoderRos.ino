@@ -1,3 +1,11 @@
+#include <ros.h>
+#include <std_msgs/String.h>
+#include "exo_angle_control/ExoAngle.h"
+
+ros::NodeHandle nh;
+exo_angle_control::ExoAngle AnglePub;
+ros::Publisher EncoderPub("EncoderTopic0", &AnglePub);
+
 bool Aold = false;
 bool Bold = false;
 bool Anew = false;
@@ -20,6 +28,9 @@ void setup() {
   pinMode(ChB, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ChB), changeB, CHANGE);
 
+  nh.initNode();
+  nh.advertise(EncoderPub);
+
 }
 
 void loop() {
@@ -29,7 +40,21 @@ void loop() {
   Serial.print(" | Angle : ");
   Serial.println(angle);
   updateAngle();
+
+  PublishAngleFn();
+  delay(1);
 }
+
+void PublishAngleFn()
+{
+  AnglePub.hipLeft = 0;
+  AnglePub.hipRight = 0;
+  AnglePub.kneeLeft = angle;
+  AnglePub.kneeRight = 0;
+  EncoderPub.publish(&AnglePub);
+}
+
+
 void updateAngle()
 {
   if(pulse<0)pulse = PPR-1;//4*4096 from data sheet
@@ -78,55 +103,4 @@ void updatePulse(){
 
   Aold = Anew;
   Bold = Bnew;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <ros.h>
-#include <std_msgs/String.h>
-#include "exo_angle_control/ExoAngle.h"
-
-ros::NodeHandle nh;
-
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter2", &str_msg);
-
-void messageCb(const exo_angle_control::ExoAngle &angles)
-{
-  // do nothing
-}
-ros::Subscriber<exo_angle_control::ExoAngle> sub("desiredAngleTopic", &messageCb);
-
-
-char hello[13] = "hello world!";
-
-void setup()
-{
-  nh.initNode();
-  nh.advertise(chatter);
-  nh.subscribe(sub);
-}
-
-void loop()
-{
-  str_msg.data = hello;
-  chatter.publish( &str_msg );
-  nh.spinOnce();
-  delay(1000);
 }

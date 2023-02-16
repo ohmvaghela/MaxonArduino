@@ -39,12 +39,19 @@ long PPR = 16384 * GearReduction;
 /////////
 // ROS
 ros::NodeHandle nh;
+exo_angle_control::ExoAngle AnglePub;
+ros::Publisher EncoderPub("EncoderTopic0", &AnglePub);
+
+
 
 void messageCb(const exo_angle_control::ExoAngle &angles)
 {
-    desiredAngle = angles.kneeRight;
+    desiredAngle = angles.hipRight;
 }
 ros::Subscriber<exo_angle_control::ExoAngle> sub("desiredAngleTopic", &messageCb);
+
+
+
 
 ///////////////////////////////////////////////////
 
@@ -76,6 +83,8 @@ void setup()
     // ROS
     nh.initNode();
     nh.subscribe(sub);
+    nh.advertise(EncoderPub);
+
 }
 
 void loop()
@@ -88,6 +97,13 @@ void loop()
 
     // ROS
     nh.spinOnce();
+
+  AnglePub.hipLeft = 0;
+  AnglePub.hipRight = 0;
+  AnglePub.kneeLeft = angle;
+  AnglePub.kneeRight = 0;
+  EncoderPub.publish(&AnglePub);
+    
     delay(1);
 }
 
@@ -104,6 +120,7 @@ void updateDutyCycle()
     else
         dutyCycle = 0;
 }
+
 
 void updateError()
 {

@@ -11,7 +11,7 @@
 #define WEAKENING  0           // 0=normal, 1=weak (fast)
 const float stepsPerDegree = 10.0; // Adjust this value based on your motor
 int direction = 1;// 1 CW // 0 CCW
-uint8_t dutyCycle = 30;
+uint8_t dutyCycle = 300;
 
 //Create an instance of 'IFX007TMotorControl' called 'MyMotor'
 IFX007TMotorControl MyMotor = IFX007TMotorControl();
@@ -26,7 +26,7 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 30;
+float desiredAngle = 270;
 float error;
 
 const byte ChA = 21;
