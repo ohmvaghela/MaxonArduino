@@ -15,11 +15,21 @@ float PPR = 16384 * GearReduction;
 
 // ros
 #include <ros.h>
-#include "exo_angle_control/ExoAngle.h"
+#include "exo_angle_control/EncoderKL.h"
+#include "exo_angle_control/EncoderHL.h"
+#include "exo_angle_control/EncoderHR.h"
 ros::NodeHandle nh;
 
-exo_angle_control::ExoAngle curAngle;
-ros::Publisher pub_temp("updateAngleTopic", &curAngle);
+exo_angle_control::EncoderKL curAngle0;
+ros::Publisher pub_temp0("updateKLTopic", &curAngle0);
+exo_angle_control::EncoderHL curAngle1;
+ros::Publisher pub_temp1("updateHLTopic", &curAngle1);
+float desiredAngle = 0;
+void messageCb(const exo_angle_control::EncoderHR &curAngle2)
+{
+    desiredAngle = curAngle1.angle;
+}
+ros::Subscriber<exo_angle_control::EncoderHR> sub("desiredAngleTopic", &messageCb);
 
 void setup()
 {
@@ -35,7 +45,9 @@ void setup()
     // ros
     pinMode(LED_BUILTIN, OUTPUT);
     nh.initNode();
-    nh.advertise(pub_temp);
+    nh.advertise(pub_temp0);
+    nh.advertise(pub_temp1);
+    nh.subscribe(sub);
 
     // nh.subscribe(sub);
 }
@@ -43,7 +55,6 @@ void setup()
 void loop()
 {
     // encoder
-    printEncoder();
     updateAngle();
 
     // ros
@@ -54,19 +65,10 @@ void loop()
 
 void updateAndPublish()
 {
-//    curAngle.hipLeft = angle;
-//    curAngle.hipRight = angle;
-    curAngle.kneeLeft = angle;
-//    curAngle.kneeRight = angle;
-    pub_temp.publish(&curAngle);
-}
-
-void printEncoder()
-{
-    Serial.print("pulse : ");
-    Serial.print(pulse);
-    Serial.print(" | Angle : ");
-    Serial.println(angle);
+    curAngle0.angle = angle;
+    pub_temp0.publish(&curAngle0);
+    curAngle1.angle = angle;
+    pub_temp1.publish(&curAngle1);
 }
 
 void updateAngle()

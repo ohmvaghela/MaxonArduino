@@ -26,7 +26,7 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 270;
+float desiredAngle = 20;
 float error;
 
 const byte ChA = 21;
