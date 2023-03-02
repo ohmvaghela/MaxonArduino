@@ -7,13 +7,14 @@
 #include <ros.h>
 #include "std_msgs/Empty.h"
 #include "exo_angle_control/ExoAngle.h"
+#include "exo_angle_control/EncoderHL.h"
 
 ///////////////////////////////////////////////////
 // BLDC
 #define WEAKENING 0                // 0=normal, 1=weak (fast)
 const float stepsPerDegree = 10.0; // Adjust this value based on your motor
 int direction = 1;                 // 1 CW // 0 CCW
-uint8_t dutyCycle = 30;
+uint8_t dutyCycle = 80;
 
 // Create an instance of 'IFX007TMotorControl' called 'MyMotor'
 IFX007TMotorControl MyMotor = IFX007TMotorControl();
@@ -33,17 +34,20 @@ float error;
 const byte ChA = 21;
 const byte ChB = 20;
 
-long GearReduction = 80;
+long GearReduction = 150;
 long PPR = 16384 * GearReduction;
 
 /////////
 // ROS
-#include "exo_angle_control/EncoderHL.h"
-
-exo_angle_control::EncoderHL EncoderAngle;
-ros::Publisher encoder_pub("EncoderHLTopic", &EncoderAngle);
-
 ros::NodeHandle nh;
+
+void messageCb(const exo_angle_control::ExoAngle &angles)
+{
+    desiredAngle = angles.hipRight;
+}
+ros::Subscriber<exo_angle_control::ExoAngle> sub("desiredAngleTopic", &messageCb);
+exo_angle_control::EncoderHL curAngle;
+ros::Publisher pub_temp("updateHLTopic", &curAngle);
 
 ///////////////////////////////////////////////////
 
@@ -74,7 +78,9 @@ void setup()
     /////////
     // ROS
     nh.initNode();
-    nh.advertise(encoder_pub);
+    nh.subscribe(sub);
+    nh.advertise(pub_temp);
+
 }
 
 void loop()
@@ -86,20 +92,21 @@ void loop()
     rotateMotor();
 
     // ROS
-    updateAndPublish();
+    updateAndPublish();    
     nh.spinOnce();
     delay(1);
 }
 
 void updateAndPublish()
 {
-  EncoderAngle.angle = angle;
-  encoder_pub.publish(&EncoderAngle);
+    curAngle.angle = angle;
+    pub_temp.publish(&curAngle);
 }
+
 
 void rotateMotor()
 {
-    MyMotor.setHallBLDCmotorDCspeed(direction, dutyCycle, WEAKENING);
+    MyMotor.setHallBLDCmotorDCspeed(1, 150, WEAKENING);
 }
 
 void updateDutyCycle()
@@ -148,7 +155,7 @@ void updateStates()
 {
     updateAngle();
     updateError();
-    //updateDutyCycle();
+    updateDutyCycle();
 }
 
 void changeA()

@@ -26,7 +26,7 @@ bool Bnew = false;
 
 float pulse = 10.0;
 float angle = 0;
-float desiredAngle = 20;
+float desiredAngle = 90;
 float error;
 
 const byte ChA = 21;
@@ -91,7 +91,7 @@ void rotateMotor()
 
 void updateDutyCycle()
 {
-  if(error > 3) dutyCycle = 30 + 20*(error/180.0f);
+  if(error > 3) dutyCycle = 50 + 20*(error/180.0f);
   else dutyCycle = 0;
 }
 
