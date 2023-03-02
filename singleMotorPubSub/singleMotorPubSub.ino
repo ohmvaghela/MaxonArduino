@@ -7,7 +7,7 @@
 #include <ros.h>
 #include "std_msgs/Empty.h"
 #include "exo_angle_control/ExoAngle.h"
-#include "exo_angle_control/EncoderHL.h"
+#include "exo_angle_control/EncoderKL.h"
 
 ///////////////////////////////////////////////////
 // BLDC
@@ -43,11 +43,11 @@ ros::NodeHandle nh;
 
 void messageCb(const exo_angle_control::ExoAngle &angles)
 {
-    desiredAngle = angles.hipRight;
+    desiredAngle = angles.kneeLeft;
 }
 ros::Subscriber<exo_angle_control::ExoAngle> sub("desiredAngleTopic", &messageCb);
-exo_angle_control::EncoderHL curAngle;
-ros::Publisher pub_temp("updateHLTopic", &curAngle);
+exo_angle_control::EncoderKL curAngle;
+ros::Publisher pub_temp("updateKLTopic", &curAngle);
 
 ///////////////////////////////////////////////////
 
@@ -112,7 +112,7 @@ void rotateMotor()
 void updateDutyCycle()
 {
     if (error > 3)
-        dutyCycle = 30 + 20 * (error / 180.0f);
+        dutyCycle = 100 + 20 * (error / 180.0f);
     else
         dutyCycle = 0;
 }

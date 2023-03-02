@@ -1,4 +1,6 @@
-# angle#ubscrible 
+> while testing dummy gait motion set the motors such that they are in phase 1 not in standing position
+> or make them move to that phase itself 
+# anglesubscrible 
 - ROS 
     - publish ExoAngle.msg
 - Arduino 
